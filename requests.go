@@ -19,7 +19,6 @@ type PaymentRequest struct {
 
 type CryptogramPaymentRequest struct {
 	PaymentRequest
-	IpAddress            string
 	CardCryptogramPacket string
 	AccountId            *string
 }
