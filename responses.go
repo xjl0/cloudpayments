@@ -1,50 +1,43 @@
 package cp_go
 
-import "time"
-
 type BaseResponse struct {
-	Success bool
-	Message string
+	Success bool   `json:"Success,omitempty"`
+	Message string `json:"Message,omitempty"`
 }
 type PaymentModel struct {
-	ID                int
-	Amount            float64
-	Currency          string
-	CurrencyCode      int
-	InvoiceID         string
-	AccountID         string
-	Email             string
-	Description       string
-	Data              []byte
-	CreatedAt         time.Time
-	AuthorizedAt      time.Time
-	ConfirmedAt       time.Time
-	AuthCode          string
-	TestMode          bool
-	IpAddress         string
-	IpCountry         string
-	IpCity            string
-	IpRegion          string
-	IpDistrict        string
-	IpLatitude        float64
-	IpLongitude       float64
-	CardFirstSix      string
-	CardLastFour      string
-	CardExpiredMonth  int
-	CardExpiredYear   int
-	CardType          string
-	CardTypeCode      int
-	Issuer            string
-	IssuerBankCountry string
-	Status            string
-	StatusCode        int
-	Reason            string
-	ReasonCode        int
-	CardHolderMessage string
-	CardHolderName    string
-	Token             string
-	JsonData          string
-	Name              string
+	Amount            float64 `json:"Amount,omitempty"`
+	Currency          string  `json:"Currency,omitempty"`
+	CurrencyCode      int     `json:"CurrencyCode,omitempty"`
+	InvoiceID         string  `json:"InvoiceID,omitempty"`
+	AccountID         string  `json:"AccountID,omitempty"`
+	Email             string  `json:"Email,omitempty"`
+	Description       string  `json:"Description,omitempty"`
+	Data              []byte  `json:"Data,omitempty"`
+	TestMode          bool    `json:"TestMode,omitempty"`
+	IpAddress         string  `json:"IpAddress,omitempty"`
+	IpCountry         string  `json:"IpCountry,omitempty"`
+	IpCity            string  `json:"IpCity,omitempty"`
+	IpRegion          string  `json:"IpRegion,omitempty"`
+	IpDistrict        string  `json:"IpDistrict,omitempty"`
+	IpLatitude        float64 `json:"IpLatitude,omitempty"`
+	IpLongitude       float64 `json:"IpLongitude,omitempty"`
+	CardFirstSix      string  `json:"CardFirstSix,omitempty"`
+	CardLastFour      string  `json:"CardLastFour,omitempty"`
+	CardExpiredMonth  int     `json:"CardExpiredMonth,omitempty"`
+	CardExpiredYear   int     `json:"CardExpiredYear,omitempty"`
+	CardType          string  `json:"CardType,omitempty"`
+	CardTypeCode      int     `json:"CardTypeCode,omitempty"`
+	Issuer            string  `json:"Issuer,omitempty"`
+	IssuerBankCountry string  `json:"IssuerBankCountry,omitempty"`
+	Status            string  `json:"Status,omitempty"`
+	StatusCode        int     `json:"StatusCode,omitempty"`
+	Reason            string  `json:"Reason,omitempty"`
+	ReasonCode        int     `json:"ReasonCode,omitempty"`
+	CardHolderMessage string  `json:"CardHolderMessage,omitempty"`
+	CardHolderName    string  `json:"CardHolderName,omitempty"`
+	Token             string  `json:"Token,omitempty"`
+	JsonData          string  `json:"JsonData,omitempty"`
+	Name              string  `json:"Name,omitempty"`
 }
 
 type SubscriptionModel struct {
@@ -63,32 +56,30 @@ type SubscriptionModel struct {
 }
 
 type Payment3DSModel struct {
-	TransactionId int
-	PaReq         string
-	AcsUrl        string
+	TransactionId  int    `json:"TransactionId,omitempty"`
+	PaReq          string `json:"PaReq,omitempty"`
+	AcsUrl         string `json:"AcsUrl,omitempty"`
+	AuthDate       string `json:"AuthDate,omitempty"`
+	AuthDateIso    string `json:"AuthDateIso,omitempty"`
+	AuthCode       string `json:"AuthCode,omitempty"`
+	ConfirmDate    string `json:"ConfirmDate,omitempty"`
+	ConfirmDateIso string `json:"ConfirmDateIso,omitempty"`
 }
 
-type PaymentFailedResponse struct {
-	BaseResponse
-	Model PaymentModel
-}
-
-type PaymentSuccessResponse struct {
+type PaymentResponse struct {
 	BaseResponse
 	Model struct {
 		PaymentModel
-		AuthDate       string
-		AuthDateIso    string
-		AuthCode       string
-		ConfirmDate    string
-		ConfirmDateIso string
-		Token          string
+		Payment3DSModel
 	}
 }
 
 type Payment3DSResponse struct {
 	BaseResponse
-	Model Payment3DSModel
+	Model struct {
+		PaymentModel
+		Payment3DSModel
+	}
 }
 
 type SubscriptionResponse struct {

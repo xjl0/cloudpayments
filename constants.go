@@ -1,5 +1,15 @@
 package cp_go
 
+type PaymentStatus string
+
+const (
+	PaymentStatusAwaitingAuthentication PaymentStatus = "AwaitingAuthentication"
+	PaymentStatusAuthorized             PaymentStatus = "Authorized"
+	PaymentStatusCompleted              PaymentStatus = "Completed"
+	PaymentStatusCancelled              PaymentStatus = "Cancelled"
+	PaymentStatusDeclined               PaymentStatus = "Declined"
+)
+
 const (
 	ReferToCardIssuer = 5001 // Отказ эмитента проводить онлайн операцию
 

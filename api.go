@@ -3,17 +3,14 @@ package cp_go
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
 const url = "https://api.cloudpayments.ru/"
 
-func (c *Client) sendRequest(endpoint string, params []byte, requestId *int) ([]byte, error) {
+func (c *Client) sendRequest(endpoint string, params []byte, requestID *string) ([]byte, error) {
 	req, err := http.NewRequest("POST", url+endpoint, bytes.NewBuffer(params))
-
 	if err != nil {
 		return nil, err
 	}
@@ -21,175 +18,157 @@ func (c *Client) sendRequest(endpoint string, params []byte, requestId *int) ([]
 	req.SetBasicAuth(c.config.PublicId, c.config.ApiSecret)
 	req.Header.Set("Content-Type", "application/json")
 
-	if requestId != nil {
-		req.Header.Set("X-Request-ID", fmt.Sprint(requestId))
+	if requestID != nil {
+		req.Header.Set("X-Request-ID", *requestID)
 	}
 
 	client := &http.Client{Timeout: c.config.Timeout}
 
 	resp, err := client.Do(req)
-
 	if err != nil {
 		return nil, err
 	}
 
+	resp.Close = true
 	defer resp.Body.Close()
 
-	body, _ := ioutil.ReadAll(resp.Body)
-	return body, nil
+	return ioutil.ReadAll(resp.Body)
 }
 
 func (c *Client) Ping() (map[string]interface{}, error) {
 	var data map[string]interface{}
 	response, err := c.sendRequest("test", nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	err = json.Unmarshal(response, &data)
 	return data, err
 }
 
 // ChargeCryptogramPayment Payment by cryptogram
-func (c *Client) ChargeCryptogramPayment(cpr *CryptogramPaymentRequest) (*PaymentSuccessResponse, *PaymentFailedResponse, error) {
-	success := &PaymentSuccessResponse{}
-	failed := &PaymentFailedResponse{}
+func (c *Client) ChargeCryptogramPayment(cpr *CryptogramPaymentRequest) (*PaymentResponse, error) {
+	paymentReponse := &PaymentResponse{}
 
-	params, _ := json.Marshal(cpr)
-
-	response, err := c.sendRequest("payments/cards/charge", params, nil)
-
+	params, err := json.Marshal(cpr)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	err = json.Unmarshal(response, &success)
+	response, err := c.sendRequest("payments/cards/charge", params, cpr.RequestID)
 
 	if err != nil {
-		err = json.Unmarshal(response, &failed)
-		if err != nil {
-			return nil, nil, err
-		}
-		return nil, failed, nil
+		return nil, err
 	}
 
-	return success, nil, nil
+	err = json.Unmarshal(response, &paymentReponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return paymentReponse, nil
 }
 
 // AuthorizeCryptogramPayment two-stage payment
-func (c *Client) AuthorizeCryptogramPayment(cpr CryptogramPaymentRequest) (*Payment3DSResponse, *PaymentFailedResponse, error) {
-	success := &Payment3DSResponse{}
-	failed := &PaymentFailedResponse{}
+func (c *Client) AuthorizeCryptogramPayment(cpr CryptogramPaymentRequest) (*Payment3DSResponse, error) {
+	paymentReponse := &Payment3DSResponse{}
 
 	params, _ := json.Marshal(cpr)
 
-	response, err := c.sendRequest("payments/cards/auth", params, nil)
-
+	response, err := c.sendRequest("payments/cards/auth", params, cpr.RequestID)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	err = json.Unmarshal(response, &success)
-
+	err = json.Unmarshal(response, &paymentReponse)
 	if err != nil {
-		err = json.Unmarshal(response, &failed)
-		if err != nil {
-			return nil, nil, err
-		}
-		return nil, failed, nil
+		return nil, err
 	}
 
-	return success, nil, nil
+	return paymentReponse, nil
 }
 
 // ChargeTokenPayment payment by token
-func (c *Client) ChargeTokenPayment(tpr TokenPaymentRequest) (*PaymentSuccessResponse, *PaymentFailedResponse, error) {
-	success := &PaymentSuccessResponse{}
-	failed := &PaymentFailedResponse{}
+func (c *Client) ChargeTokenPayment(tpr TokenPaymentRequest) (*PaymentResponse, error) {
+	paymentReponse := &PaymentResponse{}
 
-	params, _ := json.Marshal(tpr)
-
-	response, err := c.sendRequest("payments/tokens/charge", params, nil)
-
+	params, err := json.Marshal(tpr)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	err = json.Unmarshal(response, &success)
-
+	response, err := c.sendRequest("payments/tokens/charge", params, tpr.RequestID)
 	if err != nil {
-		err = json.Unmarshal(response, &failed)
-		if err != nil {
-			return nil, nil, err
-		}
-		return nil, failed, nil
+		return nil, err
 	}
 
-	return success, nil, nil
+	err = json.Unmarshal(response, &paymentReponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return paymentReponse, nil
 }
 
 // AuthorizeTokenPayment authorize token payment
-func (c *Client) AuthorizeTokenPayment(tpr TokenPaymentRequest) (*PaymentSuccessResponse, *PaymentFailedResponse, error) {
-	success := &PaymentSuccessResponse{}
-	failed := &PaymentFailedResponse{}
+func (c *Client) AuthorizeTokenPayment(tpr TokenPaymentRequest) (*PaymentResponse, error) {
+	paymentReponse := &PaymentResponse{}
 
-	params, _ := json.Marshal(tpr)
-
-	response, err := c.sendRequest("payments/tokens/auth", params, nil)
-
+	params, err := json.Marshal(tpr)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	err = json.Unmarshal(response, &success)
-
+	response, err := c.sendRequest("payments/tokens/auth", params, tpr.RequestID)
 	if err != nil {
-		err = json.Unmarshal(response, &failed)
-		if err != nil {
-			return nil, nil, err
-		}
-		return nil, failed, nil
+		return nil, err
 	}
 
-	return success, nil, nil
+	err = json.Unmarshal(response, &paymentReponse)
+	if err != nil {
+		return nil, nil
+	}
+
+	return paymentReponse, nil
 }
 
 // Confirm3DSPayment Confirm a 3DS payment
-func (c *Client) Confirm3DSPayment(confirm3DS Confirm3DSRequest) (*PaymentSuccessResponse, *PaymentFailedResponse, error) {
-	success := &PaymentSuccessResponse{}
-	failed := &PaymentFailedResponse{}
+func (c *Client) Confirm3DSPayment(confirm3DS Confirm3DSRequest) (*PaymentResponse, error) {
+	paymentReponse := &PaymentResponse{}
 
-	params, _ := json.Marshal(confirm3DS)
-
-	response, err := c.sendRequest("payments/cards/post3ds", params, nil)
-
+	params, err := json.Marshal(confirm3DS)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	err = json.Unmarshal(response, &success)
-
+	response, err := c.sendRequest("payments/cards/post3ds", params, confirm3DS.RequestID)
 	if err != nil {
-		err = json.Unmarshal(response, &failed)
-		if err != nil {
-			return nil, nil, err
-		}
-		return nil, failed, nil
+		return nil, err
 	}
 
-	return success, nil, nil
+	err = json.Unmarshal(response, &paymentReponse)
+	if err != nil {
+		return nil, nil
+	}
+
+	return paymentReponse, nil
 }
 
 // ConfirmPayment confirm an authorized payment
 func (c *Client) ConfirmPayment(confirm ConfirmPaymentRequest) (*BaseResponse, error) {
 	baseResponse := &BaseResponse{}
 
-	params, _ := json.Marshal(confirm)
-	log.Println(string(params))
-	response, err := c.sendRequest("payments/confirm", params, nil)
+	params, err := json.Marshal(confirm)
+	if err != nil {
+		return nil, err
+	}
 
+	response, err := c.sendRequest("payments/confirm", params, confirm.RequestID)
 	if err != nil {
 		return nil, err
 	}
 
 	err = json.Unmarshal(response, &baseResponse)
-
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +181,7 @@ func (c *Client) RefundPayment(rpp RefundPaymentRequest) (*BaseResponse, error) 
 	baseResponse := &BaseResponse{}
 
 	params, _ := json.Marshal(rpp)
-	response, err := c.sendRequest("payments/refund", params, nil)
+	response, err := c.sendRequest("payments/refund", params, rpp.RequestID)
 
 	if err != nil {
 		return nil, err
@@ -222,14 +201,12 @@ func (c *Client) VoidPayment(vpr VoidPaymentRequest) (*BaseResponse, error) {
 	baseResponse := &BaseResponse{}
 
 	params, _ := json.Marshal(vpr)
-	response, err := c.sendRequest("payments/void", params, nil)
-
+	response, err := c.sendRequest("payments/void", params, vpr.RequestID)
 	if err != nil {
 		return nil, err
 	}
 
 	err = json.Unmarshal(response, &baseResponse)
-
 	if err != nil {
 		return nil, err
 	}
@@ -237,18 +214,54 @@ func (c *Client) VoidPayment(vpr VoidPaymentRequest) (*BaseResponse, error) {
 	return baseResponse, nil
 }
 
-// GetPayment
-func (c *Client) GetPayment(gpr GetPaymentRequest) {
-	// TODO implement
+// Payment getting pyment by transaction id
+func (c *Client) Payment(gpr GetPaymentRequest) (*PaymentResponse, error) {
+
+	paymentResponse := &PaymentResponse{}
+
+	params, err := json.Marshal(gpr)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := c.sendRequest("payments/get", params, gpr.RequestID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(response, &paymentResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return paymentResponse, nil
 }
 
-// FindPaymentByInvoiceId
-func (c *Client) FindPaymentByInvoiceId() {
-	// TODO implement
+// FindPaymentByInvoiceID
+func (c *Client) FindPaymentByInvoiceID(fpr FindPaymentRequest) (*PaymentResponse, error) {
+
+	paymentResponse := &PaymentResponse{}
+
+	params, err := json.Marshal(fpr)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := c.sendRequest("v2/payments/find", params, fpr.RequestID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(response, &paymentResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return paymentResponse, nil
 }
 
-// GetPaymentsList
-func (c *Client) GetPaymentsList() {
+// PaymentsList
+func (c *Client) PaymentsList() {
 	// TODO implement
 }
 
@@ -257,15 +270,17 @@ func (c *Client) CreateOrder(lpr LinkPaymentRequest) (*BaseResponse, error) {
 
 	baseResponse := &BaseResponse{}
 
-	params, _ := json.Marshal(lpr)
-	response, err := c.sendRequest("orders/create", params, nil)
+	params, err := json.Marshal(lpr)
+	if err != nil {
+		return nil, err
+	}
 
+	response, err := c.sendRequest("orders/create", params, lpr.RequestID)
 	if err != nil {
 		return nil, err
 	}
 
 	err = json.Unmarshal(response, &baseResponse)
-
 	if err != nil {
 		return nil, err
 	}
@@ -277,9 +292,12 @@ func (c *Client) CreateOrder(lpr LinkPaymentRequest) (*BaseResponse, error) {
 func (c *Client) CreateSubscription(scr SubscriptionCreateRequest) (*SubscriptionResponse, error) {
 	subscriptionResponse := &SubscriptionResponse{}
 
-	params, _ := json.Marshal(scr)
-	response, err := c.sendRequest("subscriptions/create", params, nil)
+	params, err := json.Marshal(scr)
+	if err != nil {
+		return nil, err
+	}
 
+	response, err := c.sendRequest("subscriptions/create", params, scr.RequestID)
 	if err != nil {
 		return nil, err
 	}
@@ -297,15 +315,17 @@ func (c *Client) CreateSubscription(scr SubscriptionCreateRequest) (*Subscriptio
 func (c *Client) UpdateSubscription(sur SubscriptionUpdateRequest) (*SubscriptionResponse, error) {
 	subscriptionResponse := &SubscriptionResponse{}
 
-	params, _ := json.Marshal(sur)
-	response, err := c.sendRequest("subscriptions/update", params, nil)
+	params, err := json.Marshal(sur)
+	if err != nil {
+		return nil, err
+	}
 
+	response, err := c.sendRequest("subscriptions/update", params, sur.RequestID)
 	if err != nil {
 		return nil, err
 	}
 
 	err = json.Unmarshal(response, &subscriptionResponse)
-
 	if err != nil {
 		return nil, err
 	}
@@ -317,9 +337,12 @@ func (c *Client) UpdateSubscription(sur SubscriptionUpdateRequest) (*Subscriptio
 func (c *Client) CancelSubscription(sur SubscriptionUpdateRequest) (*BaseResponse, error) {
 	baseResponse := &BaseResponse{}
 
-	params, _ := json.Marshal(sur)
-	response, err := c.sendRequest("subscriptions/cancel", params, nil)
+	params, err := json.Marshal(sur)
+	if err != nil {
+		return nil, err
+	}
 
+	response, err := c.sendRequest("subscriptions/cancel", params, sur.RequestID)
 	if err != nil {
 		return nil, err
 	}
@@ -337,15 +360,17 @@ func (c *Client) CancelSubscription(sur SubscriptionUpdateRequest) (*BaseRespons
 func (c *Client) GetSubscription(sgr SubscriptionGetRequest) (*SubscriptionResponse, error) {
 	subscriptionResponse := &SubscriptionResponse{}
 
-	params, _ := json.Marshal(sgr)
-	response, err := c.sendRequest("subscriptions/get", params, nil)
+	params, err := json.Marshal(sgr)
+	if err != nil {
+		return nil, err
+	}
 
+	response, err := c.sendRequest("subscriptions/get", params, sgr.RequestID)
 	if err != nil {
 		return nil, err
 	}
 
 	err = json.Unmarshal(response, &subscriptionResponse)
-
 	if err != nil {
 		return nil, err
 	}
@@ -357,15 +382,17 @@ func (c *Client) GetSubscription(sgr SubscriptionGetRequest) (*SubscriptionRespo
 func (c *Client) GetSubscriptionsList(slr SubscriptionListRequest) (*SubscriptionsListResponse, error) {
 	list := &SubscriptionsListResponse{}
 
-	params, _ := json.Marshal(slr)
-	response, err := c.sendRequest("subscriptions/find", params, nil)
+	params, err := json.Marshal(slr)
+	if err != nil {
+		return nil, err
+	}
 
+	response, err := c.sendRequest("subscriptions/find", params, slr.RequestID)
 	if err != nil {
 		return nil, err
 	}
 
 	err = json.Unmarshal(response, &list)
-
 	if err != nil {
 		return nil, err
 	}

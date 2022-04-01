@@ -2,6 +2,7 @@ package cp_go
 
 type BaseRequest struct {
 	CultureName string
+	RequestID   *string
 }
 
 type PaymentRequest struct {
@@ -59,6 +60,11 @@ type GetPaymentRequest struct {
 	TransactionId int
 }
 
+type FindPaymentRequest struct {
+	BaseRequest
+	InvoiceId string
+}
+
 type LinkPaymentRequest struct {
 	BaseRequest
 	Amount      int
@@ -75,6 +81,7 @@ type AccountRequest struct {
 }
 
 type SubscriptionBase struct {
+	BaseRequest
 	AccountRequest
 	Description         string
 	Amount              float64

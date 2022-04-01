@@ -1,6 +1,7 @@
 package cp_go
 
 import (
+	"os"
 	"testing"
 	"time"
 )
@@ -8,8 +9,8 @@ import (
 func TestClient_Ping(t *testing.T) {
 
 	client := NewClient(Config{
-		ApiSecret: "YOUR_API_SECRET",
-		PublicId:  "YOUR_PUBLIC_ID",
+		ApiSecret: os.Getenv("CLOUD_PAYMENTS_API_SECRET"),
+		PublicId:  os.Getenv("CLOUD_PAYMENTS_PUBLIC_ID"),
 		Timeout:   30 * time.Second,
 	})
 

@@ -4,7 +4,7 @@ Client for the [Cloud Payments](https://cloudpayments.ru) payment service allows
 
 ### Install
 
-`go get github.com/raymayemir/cp-go`
+`go get github.com/Miha-ha/cp-go`
 
 ### Config
 | Property | Type | Description | Default | Required
@@ -16,7 +16,7 @@ Client for the [Cloud Payments](https://cloudpayments.ru) payment service allows
 ### Usage 
 ```go
 
-import cp "github.com/raymayemir/cp-go"
+import cp "github.com/Miha-ha/cp-go"
 
 client := cp.NewClient(cp.Config{
     ApiSecret: "api_secret",
@@ -47,7 +47,7 @@ If successful, it returns a `map[string]interface{}` else returns `error`.
 | ConfirmPayment | Payment confirmation | https://developers.cloudpayments.ru/#podtverzhdenie-oplaty |
 | RefundPayment | Refund money | https://developers.cloudpayments.ru/#vozvrat-deneg |
 | VoidPayment | Cancellation of payment | https://developers.cloudpayments.ru/#otmena-oplaty |
-| GetPayment | Viewing operation information(todo) | https://developers.cloudpayments.ru/#prosmotr-tranzaktsii |
+| Payment | Viewing operation information(todo) | https://developers.cloudpayments.ru/#prosmotr-tranzaktsii |
 | FindPaymentByInvoiceId | Checking the payment status(todo) | https://developers.cloudpayments.ru/#proverka-statusa-platezha |
 | GetPaymentsList | List of transactions(todo) | https://developers.cloudpayments.ru/#vygruzka-spiska-tranzaktsiy |
 | CreateOrder | Creating an invoice to send by mail | https://developers.cloudpayments.ru/#sozdanie-scheta-dlya-otpravki-po-pochte |
@@ -64,11 +64,6 @@ If successful, it returns a `map[string]interface{}` else returns `error`.
 * Receipt
 * Notification handlers?
 * Finish (todo) marked methods
-
-### Discussion
-
-* API methods multiple return values or just no need to `PaymentFailedResponse`
-
 
 ### Problems and improvements
 
