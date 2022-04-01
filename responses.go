@@ -5,6 +5,7 @@ type BaseResponse struct {
 	Message string `json:"Message,omitempty"`
 }
 type PaymentModel struct {
+	TransactionId     int     `json:"TransactionId,omitempty"`
 	Amount            float64 `json:"Amount,omitempty"`
 	Currency          string  `json:"Currency,omitempty"`
 	CurrencyCode      int     `json:"CurrencyCode,omitempty"`
@@ -56,7 +57,6 @@ type SubscriptionModel struct {
 }
 
 type Payment3DSModel struct {
-	TransactionId  int    `json:"TransactionId,omitempty"`
 	PaReq          string `json:"PaReq,omitempty"`
 	AcsUrl         string `json:"AcsUrl,omitempty"`
 	AuthDate       string `json:"AuthDate,omitempty"`
