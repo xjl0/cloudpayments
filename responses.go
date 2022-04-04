@@ -57,13 +57,14 @@ type SubscriptionModel struct {
 }
 
 type Payment3DSModel struct {
-	PaReq          string `json:"PaReq,omitempty"`
-	AcsUrl         string `json:"AcsUrl,omitempty"`
-	AuthDate       string `json:"AuthDate,omitempty"`
-	AuthDateIso    string `json:"AuthDateIso,omitempty"`
-	AuthCode       string `json:"AuthCode,omitempty"`
-	ConfirmDate    string `json:"ConfirmDate,omitempty"`
-	ConfirmDateIso string `json:"ConfirmDateIso,omitempty"`
+	PaReq             string `json:"PaReq,omitempty"`
+	AcsUrl            string `json:"AcsUrl,omitempty"`
+	ThreeDsCallbackId string `jsno:"ThreeDsCallbackId,omitempty"`
+	AuthDate          string `json:"AuthDate,omitempty"`
+	AuthDateIso       string `json:"AuthDateIso,omitempty"`
+	AuthCode          string `json:"AuthCode,omitempty"`
+	ConfirmDate       string `json:"ConfirmDate,omitempty"`
+	ConfirmDateIso    string `json:"ConfirmDateIso,omitempty"`
 }
 
 type PaymentResponse struct {
