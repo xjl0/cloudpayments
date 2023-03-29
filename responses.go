@@ -1,4 +1,4 @@
-package cp_go
+package cloudpayments
 
 type BaseResponse struct {
 	Success bool   `json:"Success,omitempty"`

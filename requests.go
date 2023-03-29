@@ -1,4 +1,4 @@
-package cp_go
+package cloudpayments
 
 type BaseRequest struct {
 	CultureName string

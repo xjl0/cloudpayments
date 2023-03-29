@@ -1,4 +1,4 @@
-package cp_go
+package cloudpayments
 
 import (
 	"os"
